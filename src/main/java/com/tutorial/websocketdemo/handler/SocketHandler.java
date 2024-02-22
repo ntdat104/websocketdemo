@@ -23,12 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class SocketHandler implements WebSocketHandler {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     private final BinanceClient binanceClient;
 
-    public SocketHandler(BinanceClient binanceClient) {
+    public SocketHandler(BinanceClient binanceClient, ObjectMapper objectMapper) {
         this.binanceClient = binanceClient;
+        this.objectMapper = objectMapper;
     }
 
     private final List<WebSocketSession> sessions = new ArrayList<>();

@@ -5,22 +5,21 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
-import com.tutorial.websocketdemo.client.BinanceClient;
 import com.tutorial.websocketdemo.handler.SocketHandler;
 
 @Configuration
 @EnableWebSocket
 public class WebsocketConfig implements WebSocketConfigurer {
 
-    private final BinanceClient binanceClient;
+    private final SocketHandler socketHandler;
 
-    public WebsocketConfig(BinanceClient binanceClient) {
-        this.binanceClient = binanceClient;
+    public WebsocketConfig(SocketHandler socketHandler) {
+        this.socketHandler = socketHandler;
     }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new SocketHandler(binanceClient), "/ws").setAllowedOrigins("*");
+        registry.addHandler(socketHandler, "/ws").setAllowedOrigins("*");
     }
-    
+
 }

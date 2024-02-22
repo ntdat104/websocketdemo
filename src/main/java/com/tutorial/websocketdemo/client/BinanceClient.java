@@ -25,16 +25,17 @@ public class BinanceClient extends WebSocketClient {
 
     private final CryptoService cryptoService;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     private HashSet<String> params = new HashSet<>();
 
     private Map<WebSocketSession, HashSet<String>> sessions = new LinkedHashMap<>();
 
-    public BinanceClient(CryptoService cryptoService) {
+    public BinanceClient(CryptoService cryptoService, ObjectMapper objectMapper) {
         super(URI.create("wss://stream.binance.com/stream"));
         this.connect();
         this.cryptoService = cryptoService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
