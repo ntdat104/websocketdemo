@@ -28,6 +28,8 @@ public class PriceDtoConverter {
             dto.setHigh(Double.valueOf(data.getData().getKline().getHighPrice()));
             dto.setLow(Double.valueOf(data.getData().getKline().getLowPrice()));
             dto.setVolume(Double.valueOf(data.getData().getKline().getVolume()));
+            dto.setNetChange(dto.getClose() - dto.getOpen());
+            dto.setPctChange(dto.getNetChange() / dto.getOpen() * 100);
         }
 
         return dto;

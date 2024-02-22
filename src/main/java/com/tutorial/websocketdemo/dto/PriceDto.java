@@ -22,5 +22,7 @@ public class PriceDto implements Serializable {
     private Double high;
     private Double low;
     private Double volume;
+    private Double netChange;
+    private Double pctChange;
 
 }
