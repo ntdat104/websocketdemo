@@ -2,13 +2,14 @@ package com.tutorial.websocketdemo.handler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tutorial.websocketdemo.client.BinanceClient;
@@ -21,38 +22,27 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class SocketHandler implements WebSocketHandler {
+public class SocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper;
 
     private final BinanceClient binanceClient;
+
+    private final List<WebSocketSession> sessions = new ArrayList<WebSocketSession>();
 
     public SocketHandler(BinanceClient binanceClient, ObjectMapper objectMapper) {
         this.binanceClient = binanceClient;
         this.objectMapper = objectMapper;
     }
 
-    private final List<WebSocketSession> sessions = new ArrayList<>();
-
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
-        log.info("Websocket closed");
-    }
-
-    @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
-        log.info("Websocket established {}", session.getId());
-        sessions.add(session);
-    }
-
-    @Override
-    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
+    public void handleTextMessage(WebSocketSession session, TextMessage message) {
         try {
-            SocketRequest request = objectMapper.readValue(message.getPayload().toString(), SocketRequest.class);
+            SocketRequest request = objectMapper.readValue(message.getPayload(), SocketRequest.class);
 
             if (request.getType().equals(SocketType.CRYPTO)) {
                 BinanceRequest binanceRequest = new BinanceRequest();
-                binanceRequest.setId(1);
+                binanceRequest.setId(1L);
                 binanceRequest.setMethod(request.getMethod());
                 List<String> params = request.getTickers().stream().map((c) -> {
                     return c.toLowerCase() + "@"
@@ -69,8 +59,20 @@ public class SocketHandler implements WebSocketHandler {
     }
 
     @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
+        log.info("{} is closed", session.getId());
+        sessions.remove(session);
+    }
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        log.info("{} is connected", session.getId());
+        sessions.add(session);
+    }
+
+    @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
-        log.error("Error {}", exception);
+        log.error("{} has error {}", session.getId(), exception);
     }
 
     @Override

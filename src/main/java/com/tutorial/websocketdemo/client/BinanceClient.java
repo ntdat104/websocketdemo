@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -22,6 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class BinanceClient extends WebSocketClient {
+
+    @Value("${app.url.binance.websocket}")
+    private String binanceWsUrl;
 
     private final CryptoService cryptoService;
 
@@ -40,7 +44,7 @@ public class BinanceClient extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-        log.info("Binance socket is opened");
+        log.info("Binance socket is connected");
     }
 
     @Override
